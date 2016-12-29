@@ -1,3 +1,7 @@
+import controllers.UserWindow;
+import models.Text;
+import models.User;
+import network.UserConnection;
 import utils.GameSetting;
 import utils.Utils;
 
@@ -6,6 +10,7 @@ import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  * Created by tungb on 12/29/2016.
@@ -20,11 +25,57 @@ public class GameWindow extends Frame implements Runnable{
     Graphics bufferImageGraphic;
     Thread thread;
 
+    private ArrayList<Text> textArrayList;
+    private boolean hasConnection;
+
     public GameWindow() {
         configUI();
         background = Utils.loadImage("resources/background5.jpg");
         thread = new Thread(this);
         thread.start();
+
+        openUserWIndow();
+        setupText();
+    }
+
+    private void setupText() {
+        textArrayList = new ArrayList<>();
+        UserConnection.instance.connect();
+        hasConnection = UserConnection.instance.hasConnection();
+        fillDataToText();
+    }
+
+    private void fillDataToText(){
+        if(hasConnection){
+            UserConnection.instance.connect();
+            User[] topUsers = new User[5];
+            topUsers = UserConnection.instance.getTopUsers();
+            User user = null;
+            Text text = null;
+            for(int i = 0; i < 5; i++){
+                user = topUsers[i];
+                text = new Text(
+                        550,
+                        250 + i * 100,
+                        user.getName()
+                );
+                textArrayList.add(text);
+                text = new Text(
+                        950,
+                        250 + i * 100,
+                        user.getScore()+""
+                );
+                textArrayList.add(text);
+            }
+        }else{
+            textArrayList.add(new Text(500, 300, "No connection"));
+        }
+    }
+
+
+    private void openUserWIndow() {
+        UserWindow userWindow = new UserWindow();
+        userWindow.setVisible(true);
     }
 
     public void configUI(){
@@ -79,6 +130,17 @@ public class GameWindow extends Frame implements Runnable{
     @Override
     public void update(Graphics g) {
         g.drawImage(background, 0, 0, null);
+        g.setFont(new Font("Tahoma", Font.BOLD, 24));
+        Text text;
+        if(hasConnection){
+            for(int i = 0; i < 10; i++) {
+                text = textArrayList.get(i);
+                g.drawString(text.getContent(), text.getX(), text.getY());
+            }
+        }else{
+            text = textArrayList.get(0);
+            g.drawString(text.getContent(), text.getX(), text.getY());
+        }
     }
 
     @Override
