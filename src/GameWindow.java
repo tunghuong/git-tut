@@ -39,6 +39,8 @@ public class GameWindow extends Frame implements Runnable{
 
         openUserWIndow();
         setupText();
+
+        Utils.playSound("sounds/cartoon.wav", true);
     }
 
     private void setupText() {
