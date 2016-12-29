@@ -28,9 +28,12 @@ public class GameWindow extends Frame implements Runnable{
     private ArrayList<Text> textArrayList;
     private boolean hasConnection;
 
+    private Image player;
+
     public GameWindow() {
         configUI();
         background = Utils.loadImage("resources/background5.jpg");
+        player = Utils.loadImage("resources/aHuy.png");
         thread = new Thread(this);
         thread.start();
 
@@ -130,6 +133,7 @@ public class GameWindow extends Frame implements Runnable{
     @Override
     public void update(Graphics g) {
         g.drawImage(background, 0, 0, null);
+        g.drawImage(player, 100, 100, null);
         g.setFont(new Font("Tahoma", Font.BOLD, 24));
         Text text;
         if(hasConnection){
